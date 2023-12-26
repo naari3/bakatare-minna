@@ -10,3 +10,8 @@ target_groups:
     target: terraform
     gcp_service_account: tf-exec@bakatare-minecraft.iam.gserviceaccount.com
     gcp_workload_identity_provider: 'projects/619760245563/locations/global/workloadIdentityPools/bakatare-pool/providers/bakatare-prdr'
+
+tfsec:
+  enabled: false
+trivy:
+  enabled: false

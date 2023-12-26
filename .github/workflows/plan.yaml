@@ -63,6 +63,10 @@ jobs:
         with:
           github_token: ${{ steps.github_app_token.outputs.token }}
 
+      - uses: suzuki-shunsuke/tfaction/test@v1.0.1
+        with:
+          github_token: ${{ steps.github_app_token.outputs.token }}
+
       # terraform plan を実行する Action
       - uses: suzuki-shunsuke/tfaction/plan@v1.0.1
         with:
