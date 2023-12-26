@@ -1,0 +1,12 @@
+plan_workflow_name: terraform-plan
+
+target_groups:
+  - working_directory: bootstrap
+    target: bootstrap
+    gcp_service_account: tf-exec@bakatare-minecraft.iam.gserviceaccount.com
+    gcp_workload_identity_provider: 'projects/619760245563/locations/global/workloadIdentityPools/bakatare-pool/providers/bakatare-prdr'
+
+  - working_directory: terraform
+    target: terraform
+    gcp_service_account: tf-exec@bakatare-minecraft.iam.gserviceaccount.com
+    gcp_workload_identity_provider: 'projects/619760245563/locations/global/workloadIdentityPools/bakatare-pool/providers/bakatare-prdr'
