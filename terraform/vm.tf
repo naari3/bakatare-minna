@@ -36,4 +36,6 @@ resource "google_compute_instance" "minecraft" {
   metadata = {
     enable-oslogin = "TRUE"
   }
+
+  allow_stopping_for_update = true
 }
