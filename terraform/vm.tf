@@ -1,5 +1,5 @@
 locals {
-  machine_type = "t2a-standard-2"
+  machine_type = "t2a-standard-3"
 }
 
 # プリエンプティブVMの作成
@@ -36,4 +36,6 @@ resource "google_compute_instance" "minecraft" {
   metadata = {
     enable-oslogin = "TRUE"
   }
+
+  allow_stopping_for_update = true
 }
