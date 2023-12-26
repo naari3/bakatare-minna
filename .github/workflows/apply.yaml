@@ -72,10 +72,10 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@v1.0.1
         if: failure()
         with:
-          github_token: ${{steps.follow_up_pr_token.outputs.token}}
+          github_token: ${{ steps.github_app_token.outputs.token }}
 
       - uses: suzuki-shunsuke/tfaction/update-drift-issue@v1.0.1
         if: always()
         with:
           status: ${{job.status}}
-          github_token: ${{steps.drift_issue_token.outputs.token}}
+          github_token: ${{ steps.github_app_token.outputs.token }}
