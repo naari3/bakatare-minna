@@ -58,6 +58,10 @@ jobs:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
 
+      - uses: suzuki-shunsuke/github-action-actionlint@v0.1.2
+        with:
+          github_token: ${{ steps.github_app_token.outputs.token }}
+
       # terraform init などの準備を行う Action
       - uses: suzuki-shunsuke/tfaction/setup@v1.0.1
         with:
