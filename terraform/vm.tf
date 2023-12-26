@@ -30,7 +30,7 @@ resource "google_compute_instance" "minecraft" {
   }
 
   scheduling {
-    preemptible       = true # Closes within 24 hours (sometimes sooner)
+    preemptible       = true
     automatic_restart = false
   }
 
