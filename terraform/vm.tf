@@ -1,11 +1,11 @@
 locals {
   vcpu   = 2
-  memory = 2048
+  memory = 4096
 }
 
 # プリエンプティブVMの作成
-resource "google_compute_instance" "vm" {
-  name         = "vm"
+resource "google_compute_instance" "minecraft" {
+  name         = "minecraft"
   machine_type = "e2-custom-${local.vcpu}-${local.memory}"
   zone         = local.zone
   tags         = ["minecraft"]
