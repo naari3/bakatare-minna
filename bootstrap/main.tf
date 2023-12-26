@@ -5,11 +5,11 @@ locals {
   terraform_service_account_id = "tf-exec"
   terraform_service_account    = "${local.terraform_service_account_id}@${local.project_id}.iam.gserviceaccount.com"
 
-  services = toset([                       # Workload Identity 連携用
-    "iam.googleapis.com",                  # IAM
-    "cloudresourcemanager.googleapis.com", # Resource Manager
-    "iamcredentials.googleapis.com",       # Service Account Credentials
-    "sts.googleapis.com"                   # Security Token Service API
+  services = toset([
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "iamcredentials.googleapis.com",
+    "sts.googleapis.com"
   ])
 }
 

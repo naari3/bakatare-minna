@@ -58,17 +58,6 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "issues": "write"
-            }
-          repositories: >-
-            [
-              "${{github.event.repository.name}}"
-            ]
-
-
 
       # terraform init などの準備を行う Action
       - uses: suzuki-shunsuke/tfaction/setup@v1.0.1

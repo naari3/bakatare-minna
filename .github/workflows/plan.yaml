@@ -8,7 +8,9 @@ on:
 permissions:
   id-token: write
   contents: read
+  issues: read
   pull-requests: write
+  actions: read # artifact を取得するために必要
 
 jobs:
   # setup で変更のあった作業ディレクトリを取得する
