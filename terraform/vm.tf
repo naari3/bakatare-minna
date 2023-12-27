@@ -1,5 +1,5 @@
 locals {
-  machine_type = "t2a-standard-3"
+  machine_type = "t2a-standard-4"
 }
 
 # プリエンプティブVMの作成
