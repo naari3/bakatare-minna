@@ -11,7 +11,7 @@ resource "google_compute_instance" "minecraft" {
 
   metadata_startup_script = <<EOF
 # 新しいディスクを確認し、存在する場合はフォーマットしてマウント
-DISK="/dev/disk/by-id/google-mc-disk"
+DISK="/dev/disk/by-id/google-minecraft"
 MOUNT_POINT="/mnt/minecraft"
 FS_TYPE="ext4"
 if ls $${DISK} 1> /dev/null 2>&1; then
@@ -41,9 +41,9 @@ EOF
   }
 
   attached_disk {
-    source      = google_compute_disk.minecraft.id
+    source      = google_compute_disk.world_data.id
     mode        = "READ_WRITE"
-    device_name = "mc-disk"
+    device_name = "minecraft"
   }
 
   network_interface {
