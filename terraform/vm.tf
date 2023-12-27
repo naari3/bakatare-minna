@@ -38,13 +38,13 @@ EOF
       size  = 10
       type  = "pd-standard"
     }
-   }
+  }
 
-   attached_disk {
+  attached_disk {
     source      = google_compute_disk.minecraft.id
     mode        = "READ_WRITE"
     device_name = "minecraft"
-   }
+  }
 
   network_interface {
     network = google_compute_network.minecraft.name
