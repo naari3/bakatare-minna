@@ -11,8 +11,8 @@ resource "google_compute_instance" "minecraft" {
 
   metadata_startup_script = <<EOF
 # 新しいディスクを確認し、存在する場合はフォーマットしてマウント
-DISK="/dev/sdb"
-MOUNT_POINT="/mnt/mydisk"
+DISK="/dev/disk/by-id/google-minecraft"
+MOUNT_POINT="/mnt/minecraft"
 FS_TYPE="ext4"
 if ls $${DISK} 1> /dev/null 2>&1; then
   echo "フォーマットとマウントを開始: $${DISK}"
@@ -33,9 +33,18 @@ fi
 EOF
 
   boot_disk {
-    auto_delete = false
-    source      = google_compute_disk.minecraft.self_link
-  }
+    initialize_params {
+      image = "projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-arm64-v20231213"
+      size  = 10
+      type  = "pd-standard"
+    }
+   }
+
+   attached_disk {
+    source      = google_compute_disk.minecraft.id
+    mode        = "READ_WRITE"
+    device_name = "minecraft"
+   }
 
   network_interface {
     network = google_compute_network.minecraft.name
