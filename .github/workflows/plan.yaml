@@ -63,6 +63,10 @@ jobs:
         with:
           github_token: ${{ steps.github_app_token.outputs.token }}
 
+      - run: github-comment exec -- github-comment hide
+        env:
+          GITHUB_TOKEN: ${{ steps.github_app_token.outputs.token }}
+
       - uses: suzuki-shunsuke/tfaction/test@v1.0.1
         with:
           github_token: ${{ steps.github_app_token.outputs.token }}
