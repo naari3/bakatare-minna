@@ -54,6 +54,7 @@ EOF
 
   network_interface {
     network = google_compute_network.minecraft.name
+    #trivy:ignore:AVD-GCP-0031
     access_config {
       nat_ip = google_compute_address.minecraft.address
     }
