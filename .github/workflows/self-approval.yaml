@@ -9,10 +9,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@f43a0e5ff2bd294095638e18286ca9a3d1956744 # v3
 
       - name: Self-Approve Action
-        uses: nicklegan/github-repo-self-approve-action@v1.0.0
+        uses: nicklegan/github-repo-self-approve-action@86495ef73587b7ebbda94ec221f814ddde1677ba # v1.0.0
         if: github.actor == 'matchan26'
         with:
           appid: ${{ secrets.APP_ID }}
