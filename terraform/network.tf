@@ -20,6 +20,6 @@ resource "google_compute_firewall" "minecraft" {
   allow {
     protocol = "icmp"
   }
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["0.0.0.0/0"] #trivy:ignore:AVD-GCP-0027
   target_tags   = ["minecraft"]
 }
