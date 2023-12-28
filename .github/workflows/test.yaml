@@ -3,60 +3,29 @@ name: test
 on: pull_request_target
 
 concurrency:
-  group: ${{ github.workflow }}--${{ github.ref }}
+  group: ${{ github.workflow }}--${{ github.head_ref }} # github.ref is unavailable in case of pull_request_target
   cancel-in-progress: true
+
+permissions: {}
 
 jobs:
   path-filter:
-    # Get changed files to filter jobs
-    outputs:
-      merge_commit_sha: ${{steps.pr.outputs.merge_commit_sha}}
+    uses: ./.github/workflows/wc-path-filter.yaml
+    permissions: {}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
-      update-aqua-checksums: ${{steps.changes.outputs.update-aqua-checksums}}
-      renovate-config-validator: ${{steps.changes.outputs.renovate-config-validator}}
-      conftest-verify: ${{steps.changes.outputs.conftest-verify}}
-      opa-fmt: ${{steps.changes.outputs.opa-fmt}}
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read # To get pull requests of the private repository
-    steps:
-      - uses: suzuki-shunsuke/get-pr-action@b002e41164d7a39586b41f17f9caca4e98a1efe4 # v0.1.0
-        id: pr
-      - uses: dorny/paths-filter@4512585405083f25c027a35db413c2b3b9006d50 # v2.11.1
-        id: changes
-        with:
-          filters: |
-            update-aqua-checksums:
-              - aqua.yaml
-              - aqua/*.yaml
-              - aqua-checksums.json
-              - .github/workflows/test.yaml
-              - .github/workflows/wc-update-aqua-checksums.yaml
-            renovate-config-validator:
-              - renovate.json5
-              - .github/workflows/test.yaml
-              - .github/workflows/wc-renovate-config-validator.yaml
-            conftest-verify:
-              - "**.rego"
-              - aqua/conftest.yaml
-              - .github/workflows/wc-conftest-verify.yaml
-              - .github/workflows/test.yaml
-            opa-fmt:
-              - "**.rego"
-              - .github/workflows/wc-opa-fmt.yaml
-              - .github/workflows/test.yaml
-              - aqua/opa.yaml
-
-  enable-automerge:
+  enable-auto-merge:
     # This job is used for main branch's branch protection rule's status check.
     # If all dependent jobs succeed or are skipped this job succeeds.
-    uses: ./.github/workflows/wc-enable-automerge.yaml
+    uses: ./.github/workflows/wc-enable-auto-merge.yaml
     needs:
       - status-check
     permissions: {}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
     if: |
       ! failure() && ! cancelled() && github.event.pull_request.user.login == 'renovate[bot]' && contains(github.event.pull_request.body, ' **Automerge**: Enabled.')
 
@@ -65,30 +34,15 @@ jobs:
   status-check:
     runs-on: ubuntu-latest
     needs:
-      - test
       - conftest-verify
-      - opa-fmt
       - hide-comment
+      - opa-fmt
       - renovate-config-validator
+      - test
       - update-aqua-checksums
     if: failure()
     steps:
       - run: exit 1
-
-  test:
-    uses: ./.github/workflows/wc-test.yaml
-    needs: path-filter
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-    with:
-      ref: ${{needs.path-filter.outputs.merge_commit_sha}}
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
-      terraform_private_module_ssh_key: ${{secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY}}
-      secrets: ${{toJSON(secrets)}}
 
   conftest-verify:
     uses: ./.github/workflows/wc-conftest-verify.yaml
@@ -97,12 +51,35 @@ jobs:
       needs.path-filter.outputs.conftest-verify == 'true'
     permissions:
       contents: read
-      pull-requests: write
     with:
       ref: ${{needs.path-filter.outputs.merge_commit_sha}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  ghalint:
+    uses: ./.github/workflows/wc-ghalint.yaml
+    needs: path-filter
+    if: |
+      needs.path-filter.outputs.ghalint == 'true'
+    permissions:
+      contents: read
+    with:
+      ref: ${{needs.path-filter.outputs.merge_commit_sha}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+
+  hide-comment:
+    uses: ./.github/workflows/wc-hide-comment.yaml
+    needs: path-filter
+    permissions:
+      contents: read
+    with:
+      ref: ${{needs.path-filter.outputs.merge_commit_sha}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   opa-fmt:
     uses: ./.github/workflows/wc-opa-fmt.yaml
@@ -116,19 +93,7 @@ jobs:
       ref: ${{needs.path-filter.outputs.merge_commit_sha}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
-
-  hide-comment:
-    uses: ./.github/workflows/wc-hide-comment.yaml
-    needs: path-filter
-    permissions:
-      contents: read
-      pull-requests: write
-    with:
-      ref: ${{needs.path-filter.outputs.merge_commit_sha}}
-    secrets:
-      gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
 
   renovate-config-validator:
     uses: ./.github/workflows/wc-renovate-config-validator.yaml
@@ -138,6 +103,21 @@ jobs:
       ref: ${{needs.path-filter.outputs.merge_commit_sha}}
     permissions:
       contents: read
+
+  test:
+    uses: ./.github/workflows/wc-test.yaml
+    if: 'false' # CHANGEME Please remove this.
+    needs: path-filter
+    permissions:
+      id-token: write
+      contents: read
+    with:
+      ref: ${{needs.path-filter.outputs.merge_commit_sha}}
+    secrets:
+      gh_app_id: ${{secrets.APP_ID}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
+      terraform_private_module_ssh_key: ${{secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY}}
+      secrets: ${{toJSON(secrets)}}
 
   update-aqua-checksums:
     uses: ./.github/workflows/wc-update-aqua-checksums.yaml
@@ -149,4 +129,4 @@ jobs:
       ref: ${{needs.path-filter.outputs.merge_commit_sha}}
     secrets:
       gh_app_id: ${{secrets.APP_ID}}
-      gh_app_private_key: ${{secrets.PRIVATE_KEY}}
+      gh_app_private_key: ${{secrets.APP_PRIVATE_KEY}}
