@@ -1,81 +1,87 @@
-name: terraform-apply
-
+---
+name: apply
 on:
   push:
-    branches:
-      - main
-
+    branches: [main] # Disabled. CHANGEME Replace dummy with main
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  TFACTION_IS_APPLY: "true"
 permissions:
   id-token: write
   contents: read
-  issues: read
+  issues: read # this is required to `gh pr list`'s `-l` option
   pull-requests: write
-  actions: read # artifact を取得するために必要
-
+  actions: read
 jobs:
-  # plan.yaml と同様に setup で変更のあった作業ディレクトリを取得し、outputs で出力する
   setup:
     runs-on: ubuntu-latest
     outputs:
       targets: ${{ steps.list-targets.outputs.targets }}
     steps:
-      - uses: actions/checkout@v4
-
-      # aqua を使って必要なツールをインストールする
-      - uses: aquaproj/aqua-installer@v2.2.0
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: aquaproj/aqua-installer@928a2ee4243a9ee8312d80dc8cbaca88fb602a91 # v2.2.0
         with:
-          aqua_version: v2.21.0
+          aqua_version: v2.17.2
 
-      # 変更のあった作業ディレクトリを取得する Action
-      - uses: suzuki-shunsuke/tfaction/list-targets@v1.0.1
+      - uses: suzuki-shunsuke/tfaction/list-targets@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
         id: list-targets
 
-  # apply で setup で取得した変更のある作業ディレクトリを並列に実行する
   apply:
-    name: "terraform apply (${{ matrix.target.target }})"
-    runs-on: ${{ matrix.target.runs_on }}
+    name: "apply (${{matrix.target.target}})"
+    runs-on: ${{matrix.target.runs_on}}
     needs: setup
-
-    # setup で取得した変更のある作業ディレクトリが空の場合は実行しない
-    if: join(fromJSON(needs.setup.outputs.targets), '') != ''
-
+    # if services is empty, the build job is skipped
+    if: "join(fromJSON(needs.setup.outputs.targets), '') != ''"
     strategy:
       fail-fast: false
       matrix:
-        target: ${{ fromJSON(needs.setup.outputs.targets) }}
+        target: ${{fromJSON(needs.setup.outputs.targets)}}
     env:
-      TFACTION_IS_APPLY: "true" # apply する場合は TFACTION_IS_APPLY を "true" に指定
-      TFACTION_TARGET: ${{ matrix.target.target }}
-      TFACTION_JOB_TYPE: terraform
+      TFACTION_TARGET: ${{matrix.target.target}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
     steps:
-      - uses: actions/checkout@v4
-      - uses: aquaproj/aqua-installer@v2.2.0
-        with:
-          aqua_version: v2.21.0
-
-      - id: github_app_token
-        uses: tibdex/github-app-token@v2
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
 
-      # terraform init などの準備を行う Action
-      - uses: suzuki-shunsuke/tfaction/setup@v1.0.1
+      - uses: aquaproj/aqua-installer@928a2ee4243a9ee8312d80dc8cbaca88fb602a91 # v2.2.0
         with:
-          github_token: ${{ steps.github_app_token.outputs.token }}
+          aqua_version: v2.17.2
 
-      # terraform apply を実行する Action
-      - uses: suzuki-shunsuke/tfaction/apply@v1.0.1
+      - uses: suzuki-shunsuke/tfaction/export-secrets@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
         with:
-          github_token: ${{ steps.github_app_token.outputs.token }}
+          secrets: ${{ toJSON(secrets) }}
 
-      - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@v1.0.1
+      # This is required to download private modules in `terraform init`
+      - run: gh auth setup-git
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - run: tfaction get-or-create-drift-issue
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ steps.generate_token.outputs.token }}
+
+      - uses: suzuki-shunsuke/tfaction/setup@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
+
+      - uses: suzuki-shunsuke/tfaction/apply@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
+        with:
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+
+      - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
         if: failure()
         with:
-          github_token: ${{ steps.github_app_token.outputs.token }}
+          github_app_token: ${{ steps.generate_token.outputs.token }}
 
-      - uses: suzuki-shunsuke/tfaction/update-drift-issue@v1.0.1
+      - uses: suzuki-shunsuke/tfaction/update-drift-issue@5731fade20e41c1905c04095f0e3d68fac14a636 # v0.7.3
         if: always()
         with:
           status: ${{job.status}}
-          github_token: ${{ steps.github_app_token.outputs.token }}
+          github_token: ${{steps.generate_token.outputs.token}}
