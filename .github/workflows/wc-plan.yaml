@@ -27,8 +27,8 @@ jobs:
       RUNS_ON: ${{matrix.target.runs_on}}
     steps:
       - run: echo ${{env.RUNS_ON}}
-      - run: echo ${{envs.TFACTION_TARGET}}
-      - run: echo ${{envs.TFACTION_JOB_TYPE}}
+      - run: echo ${{env.TFACTION_TARGET}}
+      - run: echo ${{env.TFACTION_JOB_TYPE}}
   plan:
     name: "plan (${{matrix.target.target}})"
     runs-on: ${{fromJSON(matrix.target.runs_on)}}
