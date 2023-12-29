@@ -33,7 +33,7 @@ resource "google_compute_instance_template" "minecraft_template" {
   }
 
   metadata_startup_script = <<EOF
-INSTANCE_NAME=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/name" -H "Metadata-Flavor: Google")
+INSTANCE_NAME=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/name" -H "Metadata-Flavor: Google" | tr -d '\n')
 
 # 新しいディスクを確認し、存在する場合はフォーマットしてマウントする!!!
 FS_TYPE="ext4"
@@ -101,13 +101,8 @@ resource "google_compute_instance_group_manager" "minecraft_group" {
   name               = "minecraft-group"
   base_instance_name = "minecraft"
   version {
-    name              = "minecraft-v1"
     instance_template = google_compute_instance_template.minecraft_template.self_link
   }
   zone        = local.zone
   target_size = 1
-
-  version {
-    instance_template = google_compute_instance_template.minecraft_template.self_link
-  }
 }
