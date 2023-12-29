@@ -10,7 +10,7 @@ resource "google_compute_instance" "minecraft" {
   tags         = ["minecraft"]
 
   metadata_startup_script = <<EOF
-# 新しいディスクを確認し、存在する場合はフォーマットしてマウントする!!
+# 新しいディスクを確認し、存在する場合はフォーマットしてマウントする!!!
 DISK="/dev/disk/by-id/google-minecraft"
 MOUNT_POINT="/mnt/stateful_partition/minecraft"
 FS_TYPE="ext4"
