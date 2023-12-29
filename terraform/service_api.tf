@@ -2,6 +2,7 @@ locals {
   services = toset([
     "iam.googleapis.com",
     "cloudresourcemanager.googleapis.com",
+    "dns.googleapis.com",
     "iamcredentials.googleapis.com",
     "secretmanager.googleapis.com",
     "sts.googleapis.com"
