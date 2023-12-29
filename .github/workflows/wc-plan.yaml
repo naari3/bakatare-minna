@@ -57,25 +57,25 @@ jobs:
         with:
           secrets: ${{toJSON(secrets)}}
 
-      - name: Generate token to download private Terraform Modules
-        id: gh_setup_token
-        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
-        with:
-          app_id: ${{ secrets.gh_app_id }}
-          private_key: ${{ secrets.gh_app_private_key }}
-          # If you use private registries, contents:read is required
-          permissions: >-
-            {
-              "contents": "read"
-            }
-          # private repositories hosting private modules
-          repositories: >-
-            []
-
       # This is required to download private modules in `terraform init`
-      - run: gh auth setup-git
-        env:
-          GITHUB_TOKEN: ${{steps.gh_setup_token.outputs.token}}
+      # - name: Generate token to download private Terraform Modules
+      #   id: gh_setup_token
+      #   uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+      #   with:
+      #     app_id: ${{ secrets.gh_app_id }}
+      #     private_key: ${{ secrets.gh_app_private_key }}
+      #     # If you use private registries, contents:read is required
+      #     permissions: >-
+      #       {
+      #         "contents": "read"
+      #       }
+      #     # private repositories hosting private modules
+      #     repositories: >-
+      #       []
+
+      # - run: gh auth setup-git
+      #   env:
+      #     GITHUB_TOKEN: ${{steps.gh_setup_token.outputs.token}}
 
       - name: Generate token
         id: generate_token
