@@ -101,6 +101,7 @@ resource "google_compute_instance_group_manager" "minecraft_group" {
   name               = "minecraft-group"
   base_instance_name = "minecraft"
   version {
+    name              = "minecraft-v1"
     instance_template = google_compute_instance_template.minecraft_template.self_link
   }
   zone        = local.zone
