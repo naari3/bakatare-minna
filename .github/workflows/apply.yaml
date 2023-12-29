@@ -90,17 +90,17 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           private_key: ${{ secrets.PRIVATE_KEY }}
-          # issues:write - Create and update drift issues
-          permissions: >-
-            {
-              "issues": "write"
-            }
-          # GitHub Repository where Drift Detection issues are hosted
-          # https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection
-          repositories: >-
-            [
-              "test-tfaction-drift-issues"
-            ]
+          # # issues:write - Create and update drift issues
+          # permissions: >-
+          #   {
+          #     "issues": "write"
+          #   }
+          # # GitHub Repository where Drift Detection issues are hosted
+          # # https://suzuki-shunsuke.github.io/tfaction/docs/feature/drift-detection
+          # repositories: >-
+          #   [
+          #     "test-tfaction-drift-issues"
+          #   ]
 
       - run: tfaction get-or-create-drift-issue
         shell: bash
@@ -115,16 +115,16 @@ jobs:
           private_key: ${{ secrets.PRIVATE_KEY }}
           # pull_requests:write - Post comments
           # issues:write - Update drift issues
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "issues": "write"
-            }
-          repositories: >-
-            [
-              "${{github.event.repository.name}}",
-              "test-tfaction-drift-issues"
-            ]
+          # permissions: >-
+          #   {
+          #     "pull_requests": "write",
+          #     "issues": "write"
+          #   }
+          # repositories: >-
+          #   [
+          #     "${{github.event.repository.name}}",
+          #     "test-tfaction-drift-issues"
+          #   ]
 
       - uses: suzuki-shunsuke/tfaction/setup@233b3eebee1c48f18dfc917ef6a5cbc92510fc28 # v1.0.1-1
         with:
@@ -165,15 +165,15 @@ jobs:
           private_key: ${{ secrets.PRIVATE_KEY }}
           # contents:write - Push commits
           # pull_requests:write - Create a pull request
-          permissions: >-
-            {
-              "contents": "write",
-              "pull_requests": "write"
-            }
-          repositories: >-
-            [
-              "${{github.event.repository.name}}"
-            ]
+          # permissions: >-
+          #   {
+          #     "contents": "write",
+          #     "pull_requests": "write"
+          #   }
+          # repositories: >-
+          #   [
+          #     "${{github.event.repository.name}}"
+          #   ]
 
       - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@233b3eebee1c48f18dfc917ef6a5cbc92510fc28 # v1.0.1-1
         if: failure()
