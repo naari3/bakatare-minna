@@ -2,18 +2,55 @@ locals {
   machine_type = "t2a-standard-4"
 }
 
-# プリエンプティブVMの作成
-resource "google_compute_instance" "minecraft" {
-  name         = "minecraft"
+resource "google_compute_instance_template" "minecraft_template" {
+  name_prefix  = "minecraft-template-"
   machine_type = local.machine_type
-  zone         = local.zone
-  tags         = ["minecraft"]
+  region       = local.region
+
+  disk {
+    source_image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts-arm64"
+    auto_delete  = true
+    boot         = true
+    disk_size_gb = 10
+    disk_type    = "pd-standard"
+  }
+
+  network_interface {
+    network = google_compute_network.minecraft.name
+    access_config {
+      nat_ip = google_compute_address.minecraft.address
+    }
+  }
+
+  service_account {
+    email  = google_service_account.bakatare.email
+    scopes = ["userinfo-email", "https://www.googleapis.com/auth/cloud-platform"]
+  }
+
+  scheduling {
+    preemptible       = true
+    automatic_restart = false
+  }
 
   metadata_startup_script = <<EOF
+INSTANCE_NAME=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/name" -H "Metadata-Flavor: Google")
+
 # 新しいディスクを確認し、存在する場合はフォーマットしてマウントする!!!
+FS_TYPE="ext4"
 DISK="/dev/disk/by-id/google-minecraft"
 MOUNT_POINT="/mnt/stateful_partition/minecraft"
-FS_TYPE="ext4"
+
+gcloud compute instances attach-disk $$INSTANCE_NAME \
+  --disk ${google_compute_disk.world_data.id} \
+  --zone ${local.zone} \
+  --device-name minecraft \
+  --mode rw
+
+# デバイスが現れるまで待つ
+while [ ! -e $DISK ]; do
+  echo "Waiting for $DEVICE to be attached"
+  sleep 1
+done
 
 # マウントポイントを作成
 mkdir -p "$${MOUNT_POINT}"
@@ -49,41 +86,27 @@ cd ~/bakatare-minna/docker
 docker compose up -d
 EOF
 
-  boot_disk {
-    initialize_params {
-      image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts-arm64"
-      size  = 10
-      type  = "pd-standard"
-    }
-  }
-
-  attached_disk {
-    source      = google_compute_disk.world_data.id
-    mode        = "READ_WRITE"
-    device_name = "minecraft"
-  }
-
-  network_interface {
-    network = google_compute_network.minecraft.name
-    #trivy:ignore:AVD-GCP-0031
-    access_config {
-      nat_ip = google_compute_address.minecraft.address
-    }
-  }
-
-  service_account {
-    email  = google_service_account.bakatare.email
-    scopes = ["userinfo-email", "https://www.googleapis.com/auth/cloud-platform"]
-  }
-
-  scheduling {
-    preemptible       = true
-    automatic_restart = false
-  }
-
   metadata = {
-    enable-oslogin = "TRUE"
+    enable-oslogin  = "TRUE"
+    shutdown-script = <<EOF
+#!/bin/bash
+cd ~/bakatare-minna/docker && docker compose exec mc rcon-cli 王道注意
+EOF
   }
 
-  allow_stopping_for_update = true
+  tags = ["minecraft"]
+}
+
+resource "google_compute_instance_group_manager" "minecraft_group" {
+  name               = "minecraft-group"
+  base_instance_name = "minecraft"
+  version {
+    instance_template = google_compute_instance_template.minecraft_template.self_link
+  }
+  zone        = local.zone
+  target_size = 1
+
+  version {
+    instance_template = google_compute_instance_template.minecraft_template.self_link
+  }
 }
