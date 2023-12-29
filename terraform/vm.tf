@@ -37,7 +37,11 @@ fi
 
 git clone https://github.com/naari3/bakatare-minna ~/bakatare-minna
 cd ~/bakatare-minna/docker
-docker comopse up -d
+docker run --rm \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v "$(pwd):$(pwd)" \
+  -w "$(pwd)" \
+  docker up -d
 EOF
 
   boot_disk {
