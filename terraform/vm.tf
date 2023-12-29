@@ -95,6 +95,10 @@ EOF
   }
 
   tags = ["minecraft"]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "google_compute_instance_group_manager" "minecraft_group" {
