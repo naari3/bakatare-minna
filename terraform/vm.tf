@@ -35,18 +35,23 @@ if ! grep -qs "$${MOUNT_POINT} " /etc/fstab; then
     echo "$${DISK} $${MOUNT_POINT} $${FS_TYPE} defaults 0 2" >> /etc/fstab
 fi
 
+apt-get update -y
+apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+add-apt-repository "deb [arch=arm64] https://download.docker.com/linux/ubuntu focal stable"
+apt-get install -y docker-ce
+apt-get install docker-compose-plugin
+systemctl start docker
+systemctl enable docker
+
 git clone https://github.com/naari3/bakatare-minna ~/bakatare-minna
 cd ~/bakatare-minna/docker
-docker run --rm \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  -v "$(pwd):$(pwd)" \
-  -w "$(pwd)" \
-  docker up -d
+docker compose up -d
 EOF
 
   boot_disk {
     initialize_params {
-      image = "https://www.googleapis.com/compute/v1/projects/cos-cloud/global/images/cos-arm64-stable-109-17800-66-43"
+      image = "projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts-arm64"
       size  = 10
       type  = "pd-standard"
     }
