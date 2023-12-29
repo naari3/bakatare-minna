@@ -83,6 +83,8 @@ systemctl enable docker
 
 git clone https://github.com/naari3/bakatare-minna ~/bakatare-minna
 cd ~/bakatare-minna/docker
+DISCORD_BOT_TOKEN=$(gcloud secrets versions access latest --secret="bakatare-discord-bot-token")
+sed -i "s/your_token/$${DISCORD_BOT_TOKEN}/g" ~/bakatare-minna/docker/docker-compose.override.yaml
 docker compose up -d
 EOF
 

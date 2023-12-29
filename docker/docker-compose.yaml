@@ -11,6 +11,7 @@ services:
       FORGEVERSION: "47.2.0"
       VERSION: "1.20.1"
       MEMORY: "8G"
+      RCON_PASSWORD: minecraft
     image: itzg/minecraft-server
     restart: always
     dns:
@@ -40,7 +41,7 @@ services:
       DISCORD_BOT_TOKEN: your_token
       DISCORD_BOT_PREFIX: \
       MINECRAFT_LOG_PATH: /data/logs/latest.log
-      MINECRAFT_LOG_CHANNEL_ID: your_channel_id
+      MINECRAFT_LOG_CHANNEL_ID: "1190287509289189527"
     volumes:
       - "/mnt/stateful_partition/minecraft/bakatare:/data"
     restart: always
