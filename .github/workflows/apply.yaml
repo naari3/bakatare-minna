@@ -140,17 +140,17 @@ jobs:
           # pull_requests:write - Post comments
           # actions:read - Download plan files
           # issues:write - Update drift issues
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "actions": "read",
-              "issues": "write"
-            }
-          repositories: >-
-            [
-              "${{github.event.repository.name}}",
-              "test-tfaction-drift-issues"
-            ]
+          # permissions: >-
+          #   {
+          #     "pull_requests": "write",
+          #     "actions": "read",
+          #     "issues": "write"
+          #   }
+          # repositories: >-
+          #   [
+          #     "${{github.event.repository.name}}",
+          #     "test-tfaction-drift-issues"
+          #   ]
 
       - uses: suzuki-shunsuke/tfaction/apply@233b3eebee1c48f18dfc917ef6a5cbc92510fc28 # v1.0.1-1
         with:
