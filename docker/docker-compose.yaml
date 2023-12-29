@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+  mc:
+    ports:
+      - "25565:25565"
+      - "25575:25575"
+    environment:
+      EULA: "TRUE"
+      TYPE: FORGE
+      FORGEVERSION: "47.2.0"
+      VERSION: "1.20.1"
+    image: itzg/minecraft-server
+    restart: always
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    volumes:
+      - "/mnt/stateful_partition/minecraft/bakatare:/data"
+  rcon:
+    image: itzg/rcon
+    ports:
+      - "4326:4326"
+      - "4327:4327"
+    volumes:
+      - "rcon:/opt/rcon-web-admin/db"
+    environment:
+      RWA_USERNAME: admin
+      RWA_PASSWORD: admin
+      RWA_ADMIN: "TRUE"
+      RWA_RCON_HOST: mc
+      RWA_RCON_PASSWORD: minecraft
+    restart: always
+  bot:
+    image: ghcr.io/naari3/minecraft-command-bot:v1.4.1
+    environment:
+      RCON_HOST: mc
+      RCON_PASSWORD: minecraft
+      DISCORD_BOT_TOKEN: your_token
+      DISCORD_BOT_PREFIX: \
+      MINECRAFT_LOG_PATH: /data/logs/latest.log
+      MINECRAFT_LOG_CHANNEL_ID: your_channel_id
+    volumes:
+      - "/mnt/stateful_partition/minecraft/bakatare:/data"
+    restart: always
+
+volumes:
+  rcon:

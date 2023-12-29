@@ -35,7 +35,9 @@ if ! grep -qs "$${MOUNT_POINT} " /etc/fstab; then
     echo "$${DISK} $${MOUNT_POINT} $${FS_TYPE} defaults 0 2" >> /etc/fstab
 fi
 
-docker run -d -p 25565:25565 -e EULA=TRUE -e VERSION=1.20.1 -v $${MOUNT_POINT}/bakatare:/data --name mc -e TYPE=FORGE -e FORGEVERSION=47.2.0 -e MEMORY=2G --rm=true itzg/minecraft-server:latest;
+git clone https://github.com/naari3/bakatare-minna ~/bakatare-minna
+cd ~/bakatare-minna/docker
+docker comopse up -d
 EOF
 
   boot_disk {
