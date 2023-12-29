@@ -16,6 +16,13 @@ on:
         required: true
 
 jobs:
+  dummy-plan:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: ${{fromJSON(inputs.targets)}}
+        steps:
+          - run: echo ${{matrix.target}}
   plan:
     name: "plan (${{matrix.target.target}})"
     runs-on: ${{fromJSON(matrix.target.runs_on)}}
