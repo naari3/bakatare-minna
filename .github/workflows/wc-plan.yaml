@@ -21,8 +21,14 @@ jobs:
     strategy:
       matrix:
         target: ${{fromJSON(inputs.targets)}}
-        steps:
-          - run: echo ${{matrix.target}}
+    env: # This is required to use ${{matrix.target.runs_on}} in the following steps
+      TFACTION_TARGET: ${{matrix.target.target}}
+      TFACTION_JOB_TYPE: ${{matrix.target.job_type}}
+      RUNS_ON: ${{matrix.target.runs_on}}
+    steps:
+      - run: echo ${{env.RUNS_ON}}
+      - run: echo ${{envs.TFACTION_TARGET}}
+      - run: echo ${{envs.TFACTION_JOB_TYPE}}
   plan:
     name: "plan (${{matrix.target.target}})"
     runs-on: ${{fromJSON(matrix.target.runs_on)}}
