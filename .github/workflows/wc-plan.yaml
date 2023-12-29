@@ -44,15 +44,14 @@ jobs:
         with:
           app_id: ${{secrets.gh_app_id}}
           private_key: ${{secrets.gh_app_private_key}}
-          # issues:write - Create labels
-          # pull_requests:write - Post comments and set labels
-          # contents:write - Push commits
-          permissions: >-
-            {
-              "pull_requests": "write",
-              "issues": "write",
-              "contents": "write"
-            }
+          # permissions: >-
+          #   {
+          #     "pull_requests": "write",
+          #     "issues": "write",
+          #     "contents": "write"
+          #   }
+          # repositories: >-
+          #   ["${{github.event.repository.name}}"]
 
       # - name: Generate token (aqua)
       #   id: aqua_installer_token
