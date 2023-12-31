@@ -34,7 +34,7 @@ services:
       RWA_RCON_PASSWORD: minecraft
     restart: always
   bot:
-    image: ghcr.io/naari3/minecraft-command-bot:v1.5.0
+    image: ghcr.io/naari3/minecraft-command-bot:v1.5.1
     environment:
       SERVER_ADDRESS: mc
       RCON_HOST: mc
