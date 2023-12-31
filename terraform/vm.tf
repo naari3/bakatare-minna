@@ -92,7 +92,8 @@ EOF
     enable-oslogin  = "TRUE"
     shutdown-script = <<EOF
 #!/bin/bash
-cd ~/bakatare-minna/docker && docker compose exec mc rcon-cli 王道注意
+cd ~/bakatare-minna/docker && docker compose exec mc rcon-cli say 王道注意
+cd ~/bakatare-minna/docker && docker compose exec mc rcon-cli save-all
 EOF
   }
 
