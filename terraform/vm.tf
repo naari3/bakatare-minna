@@ -40,8 +40,8 @@ FS_TYPE="ext4"
 DISK="/dev/disk/by-id/google-minecraft"
 MOUNT_POINT="/mnt/stateful_partition/minecraft"
 
-gcloud compute instances attach-disk $$INSTANCE_NAME \
-  --disk ${google_compute_disk.world_data.id} \
+gcloud compute instances attach-disk $INSTANCE_NAME \
+  --disk ${google_compute_disk.world_data.name} \
   --zone ${local.zone} \
   --device-name minecraft \
   --mode rw
