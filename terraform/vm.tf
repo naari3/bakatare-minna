@@ -1,5 +1,5 @@
 locals {
-  machine_type = "t2a-standard-4"
+  machine_type = "t2a-standard-2"
 }
 
 resource "google_compute_instance_template" "minecraft_template" {
