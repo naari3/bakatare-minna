@@ -3,6 +3,11 @@ resource "google_service_account" "bakatare" {
   display_name = "bakatare"
 }
 
+resource "google_service_account" "bakatare-test" {
+      account_id   = "bakatare-test"
+  display_name = "bakatare-test"
+}
+
 resource "google_project_iam_member" "instance_admin" {
   project = local.project_id
   role    = "roles/compute.instanceAdmin"

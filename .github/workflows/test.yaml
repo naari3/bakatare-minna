@@ -1,6 +1,6 @@
 ---
 name: test
-on: pull_request_target
+on: pull_request
 
 concurrency:
   group: ${{ github.workflow }}--${{ github.head_ref }} # github.ref is unavailable in case of pull_request_target
