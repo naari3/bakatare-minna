@@ -19,7 +19,7 @@ jobs:
         with:
           aqua_version: v2.21.3
 
-      - uses: suzuki-shunsuke/tfaction/list-targets@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/list-targets@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         id: list-targets
 
   apply:
@@ -60,7 +60,7 @@ jobs:
         env:
           AQUA_GITHUB_TOKEN: ${{ steps.aqua_installer_token.outputs.token }}
 
-      - uses: suzuki-shunsuke/tfaction/export-secrets@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/export-secrets@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         with:
           secrets: ${{ toJSON(secrets) }}
 
@@ -126,7 +126,7 @@ jobs:
           #     "test-tfaction-drift-issues"
           #   ]
 
-      - uses: suzuki-shunsuke/tfaction/setup@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/setup@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         with:
           github_token: ${{ steps.setup_token.outputs.token }}
           ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
@@ -152,7 +152,7 @@ jobs:
           #     "test-tfaction-drift-issues"
           #   ]
 
-      - uses: suzuki-shunsuke/tfaction/apply@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/apply@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         with:
           github_token: ${{ steps.apply_token.outputs.token }}
 
@@ -175,12 +175,12 @@ jobs:
           #     "${{github.event.repository.name}}"
           #   ]
 
-      - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         if: failure()
         with:
           github_token: ${{steps.follow_up_pr_token.outputs.token}}
 
-      - uses: suzuki-shunsuke/tfaction/update-drift-issue@1c1f08c29f64df7bf1d63f7811e4cfc38056bfa1 # v1.0.3-1
+      - uses: suzuki-shunsuke/tfaction/update-drift-issue@679205dbfad0cc976eb5ab5049cb6569a505cabe # v1.0.4-1
         if: always()
         with:
           status: ${{job.status}}
